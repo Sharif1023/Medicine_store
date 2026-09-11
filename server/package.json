@@ -1,0 +1,31 @@
+{
+  "name": "shasthocare-server",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "db:migrate": "node src/scripts/migrate.js",
+    "db:seed": "node src/scripts/seed.js",
+    "db:reset": "node src/scripts/reset.js",
+    "test": "node --test tests/*.test.js",
+    "db:seed:sql": "node src/scripts/seed-sql.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "express-rate-limit": "^7.4.1",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "mysql2": "^3.11.3",
+    "nodemailer": "^6.9.16",
+    "pino": "^9.5.0",
+    "sharp": "^0.33.5",
+    "uuid": "^11.0.3",
+    "zod": "^3.23.8"
+  }
+}

@@ -1,0 +1,1 @@
+export default function Generic({title='Module'}){return <><h1 className="text-3xl font-black">{title}</h1><div className="card mt-6 p-8"><p className="text-slate-600">This operational module is wired into the shared admin shell and database architecture. Extend the table/form pattern in the same route group for store-specific fields.</p></div></>}

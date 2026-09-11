@@ -1,0 +1,66 @@
+{
+  "products": [
+    {
+      "name": "Wellness Zinc 20 mg Tablet",
+      "slug": "wellness-zinc-20mg-tablet",
+      "sku": "ZN-20-30",
+      "barcode": "890000000001",
+      "genericName": "Zinc",
+      "brandId": 2,
+      "manufacturerId": 1,
+      "categoryId": 2,
+      "productType": "Supplement",
+      "dosageForm": "Tablet",
+      "strength": "20 mg",
+      "packSize": "30 tablets",
+      "shortDescription": "<p>A <strong>demo zinc supplement</strong> catalog entry.</p>",
+      "description": "<p>Complete product description may contain <strong>bold</strong>, <em>italic</em>, lists and safe formatted HTML created by the admin rich-text editor.</p>",
+      "ingredients": "<p>Zinc ingredient information from the approved product label.</p>",
+      "usageInfo": "<p>Display only approved package-label/catalog information. This field is not personalized medical advice.</p>",
+      "warnings": "<p>Keep out of reach of children. Follow the official product label and professional advice where appropriate.</p>",
+      "storageInfo": "<p>Store in a cool, dry place away from direct sunlight.</p>",
+      "regularPrice": 360,
+      "discountPercent": 20,
+      "unitLabel": "Tablet",
+      "unitPrice": 10,
+      "unitsPerStrip": 10,
+      "stripPrice": 100,
+      "stripsPerBox": 10,
+      "unitsPerBox": 100,
+      "boxPrice": 1000,
+      "salePrice": 320,
+      "costPrice": 245,
+      "taxRate": 0,
+      "lowStockThreshold": 10,
+      "prescriptionRequired": false,
+      "featured": true,
+      "bestSeller": false,
+      "newArrival": true,
+      "active": true,
+      "seoTitle": "Wellness Zinc 20 mg Tablet",
+      "seoDescription": "Demo zinc supplement product listing.",
+      "images": [
+        {
+          "url": "https://example.com/demo-zinc-cover.webp",
+          "altText": "Wellness Zinc 20 mg Tablet",
+          "isPrimary": true
+        },
+        {
+          "url": "https://example.com/demo-zinc-back.webp",
+          "altText": "Wellness Zinc package back"
+        }
+      ],
+      "batches": [
+        {
+          "batchNumber": "ZN-DEMO-001",
+          "manufacturingDate": "2026-07-01",
+          "expiryDate": "2028-07-01",
+          "purchasePrice": 245,
+          "sellingPrice": 320,
+          "quantity": 100,
+          "supplierId": 1
+        }
+      ]
+    }
+  ]
+}

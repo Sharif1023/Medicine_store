@@ -270,27 +270,21 @@ export default function Checkout() {
      ======================================================= */
 
   const place = useMutation({
-    mutationFn: () =>
-      http
-        .post('/user/checkout', payload())
-        .then((r) => r.data.data),
+  mutationFn: () =>
+    http
+      .post('/user/checkout', payload())
+      .then((r) => r.data.data),
 
-    onSuccess: (data) => {
-      alert(
-        'Order ' +
-          data.orderNumber +
-          ' placed successfully',
-      );
+  onSuccess: () => {
+    nav('/account/orders');
+  },
 
-      nav('/account/orders');
-    },
-
-    onError: (e) =>
-      setMsg(
-        e.response?.data?.message ||
-          'Checkout failed',
-      ),
-  });
+  onError: (e) =>
+    setMsg(
+      e.response?.data?.message ||
+        'Checkout failed',
+    ),
+});
 
 
   /* =======================================================

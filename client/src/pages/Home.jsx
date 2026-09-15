@@ -430,7 +430,7 @@ function Hero({
 
           <span className="badge bg-white text-brand-700 shadow">
 
-            ✦{' '}
+            {' '}
 
             {
               settings[

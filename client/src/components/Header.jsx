@@ -417,17 +417,19 @@ export default function Header(){
             TOP ROW
             =============================================== */}
 
-        <div className="container-app flex h-20 items-center gap-4">
+        <div className="container-app flex h-20 items-center gap-3 sm:gap-4">
 
 
-          {/* LOGO */}
+          {/* =============================================
+              LOGO + BRAND NAME
+              ============================================= */}
 
           <Link
             to="/"
             onClick={
               closeMobile
             }
-            className="flex min-w-0 shrink-0 items-center gap-2"
+            className="flex min-w-0 shrink-0 items-center gap-2 sm:gap-3"
           >
 
             {logo?(
@@ -439,27 +441,49 @@ export default function Header(){
                   )
                 }
                 alt={brand}
-                className="h-11 max-w-[150px] object-contain sm:max-w-44"
+                className="
+                  h-9
+                  w-auto
+                  max-w-[52px]
+                  shrink-0
+                  object-contain
+                  min-[380px]:max-w-[65px]
+                  sm:h-11
+                  sm:max-w-[90px]
+                  lg:max-w-[110px]
+                "
               />
 
             ):(
 
-              <>
-
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-500 text-xl font-black text-white">
-                  +
-                </span>
-
-
-                <span className="hidden text-xl font-black text-slate-900 min-[380px]:block sm:text-2xl">
-
-                  {brand}
-
-                </span>
-
-              </>
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand-500 text-lg font-black text-white sm:h-10 sm:w-10 sm:text-xl">
+                +
+              </span>
 
             )}
+
+
+            {/* BRAND NAME ALWAYS VISIBLE */}
+
+            <span
+              className="
+                max-w-[85px]
+                truncate
+                text-base
+                font-black
+                leading-tight
+                text-slate-900
+                min-[380px]:max-w-[115px]
+                min-[380px]:text-lg
+                sm:max-w-[160px]
+                sm:text-xl
+                lg:max-w-[200px]
+                lg:text-2xl
+              "
+              title={brand}
+            >
+              {brand}
+            </span>
 
           </Link>
 
@@ -1013,14 +1037,16 @@ export default function Header(){
           <div className="flex h-20 shrink-0 items-center justify-between border-b border-slate-200 px-5">
 
 
-            {/* BRAND */}
+            {/* ===========================================
+                MOBILE DRAWER LOGO + NAME
+                =========================================== */}
 
             <Link
               to="/"
               onClick={
                 closeMobile
               }
-              className="flex min-w-0 items-center gap-2"
+              className="flex min-w-0 flex-1 items-center gap-2.5 pr-3"
             >
 
               {logo?(
@@ -1032,27 +1058,42 @@ export default function Header(){
                     )
                   }
                   alt={brand}
-                  className="h-10 max-w-[145px] object-contain"
+                  className="
+                    h-10
+                    w-auto
+                    max-w-[70px]
+                    shrink-0
+                    object-contain
+                  "
                 />
 
               ):(
 
-                <>
-
-                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand-500 text-lg font-black text-white">
-                    +
-                  </span>
-
-
-                  <span className="truncate text-lg font-black text-slate-900">
-
-                    {brand}
-
-                  </span>
-
-                </>
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand-500 text-lg font-black text-white">
+                  +
+                </span>
 
               )}
+
+
+              {/* BRAND NAME ALWAYS VISIBLE */}
+
+              <span
+                className="
+                  min-w-0
+                  flex-1
+                  truncate
+                  text-lg
+                  font-black
+                  leading-tight
+                  text-slate-900
+                "
+                title={brand}
+              >
+
+                {brand}
+
+              </span>
 
             </Link>
 

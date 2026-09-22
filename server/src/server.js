@@ -1,0 +1,2 @@
+import {startNotificationWorker} from './services/notifications.js';
+import app from './app.js';import {env} from './config/env.js';import {pool} from './config/db.js'; try{await pool.query('SELECT 1');startNotificationWorker();app.listen(env.port,()=>console.log(`ShasthoCare API http://localhost:${env.port}`));}catch(e){console.error('Database connection failed:',e.message);process.exit(1)}

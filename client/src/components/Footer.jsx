@@ -1,0 +1,18 @@
+import {useState} from 'react';
+import {Link} from 'react-router-dom';
+import {Facebook,Instagram,Youtube,Linkedin} from 'lucide-react';
+import http from '../api/http';
+import {useSiteConfig,setting} from '../hooks/useSiteConfig';
+import RichContent from './RichContent';
+
+const isExternal=url=>/^https?:\/\//i.test(url||'');
+function SmartLink({item}){if(isExternal(item.url))return <a href={item.url} target={item.open_new_tab?'_blank':undefined} rel={item.open_new_tab?'noreferrer':undefined} className="hover:text-white">{item.label}</a>;return <Link to={item.url||'/'} className="hover:text-white">{item.label}</Link>}
+
+export default function Footer(){
+  const {data:cfg}=useSiteConfig();const [email,setEmail]=useState('');const [msg,setMsg]=useState('');
+  const sub=async()=>{try{const r=await http.post('/newsletter',{email});setMsg(r.data.message);setEmail('')}catch(e){setMsg(e.response?.data?.message||'Could not subscribe')}};
+  const nav=cfg?.navigation||[];const group=loc=>nav.filter(x=>x.location===loc&&!x.parent_id);
+  const defaults={footer_company:[{id:'about',label:'About',url:'/page/about'},{id:'contact',label:'Contact',url:'/page/contact'},{id:'privacy',label:'Privacy Policy',url:'/page/privacy-policy'}],footer_shop:(cfg?.categories||[]).slice(0,5).map(c=>({id:'c'+c.id,label:c.name,url:'/products?category='+c.slug})),footer_help:[{id:'faq',label:'FAQ',url:'/page/faq'},{id:'track',label:'Track Order',url:'/track'},{id:'shipping',label:'Shipping',url:'/page/shipping-policy'},{id:'returns',label:'Returns',url:'/page/return-policy'}],footer_legal:[{id:'terms',label:'Terms & Conditions',url:'/page/terms'},{id:'refund',label:'Refund Policy',url:'/page/refund-policy'},{id:'disclaimer',label:'Medicine Disclaimer',url:'/page/medicine-disclaimer'}]};
+  const items=loc=>group(loc).length?group(loc):defaults[loc];
+  return <footer className="mt-16 bg-slate-950 text-slate-300"><div className="container-app grid gap-10 py-14 md:grid-cols-6"><div className="md:col-span-2"><div className="text-2xl font-black text-white">{setting(cfg,'brand.name','ShasthoCare')}</div><RichContent html={setting(cfg,'footer.about','<p>A modern healthcare marketplace for genuine products, convenient ordering and secure prescription workflows.</p>')} className="rich-content mt-3 max-w-md text-sm leading-6"/><div className="mt-5 flex max-w-lg gap-2"><input className="input text-ink" type="email" placeholder="Your email" value={email} onChange={e=>setEmail(e.target.value)}/><button className="btn-primary" onClick={sub}>Subscribe</button></div>{msg&&<div className="mt-2 text-xs text-brand-200">{msg}</div>}<div className="mt-5 flex gap-2">{[[Facebook,'social.facebook'],[Instagram,'social.instagram'],[Youtube,'social.youtube'],[Linkedin,'social.linkedin']].map(([I,k])=>{const href=setting(cfg,k,'#');return <a key={k} href={href||'#'} target={href&&href!=='#'?'_blank':undefined} rel="noreferrer" className="grid h-9 w-9 place-items-center rounded-full bg-white/10 hover:bg-brand-600"><I size={16}/></a>})}</div></div>{[['Company','footer_company'],['Shop','footer_shop'],['Help','footer_help'],['Legal','footer_legal']].map(([title,loc])=><div key={loc}><h3 className="font-bold text-white">{title}</h3><ul className="mt-4 space-y-3 text-sm">{items(loc).map(x=><li key={x.id}><SmartLink item={x}/></li>)}</ul>{loc==='footer_help'&&<div className="mt-5 text-xs leading-5 text-slate-400">{setting(cfg,'contact.phone','')}<br/>{setting(cfg,'contact.email','')}<br/>{setting(cfg,'contact.address','')}</div>}</div>)}</div><div className="border-t border-white/10 py-5 text-center text-xs">{setting(cfg,'footer.copyright','© 2026 ShasthoCare. All rights reserved.')} Medicine information does not replace professional medical advice.</div></footer>;
+}

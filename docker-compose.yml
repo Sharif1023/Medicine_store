@@ -1,0 +1,29 @@
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: shasthocare
+    ports: ["3306:3306"]
+    volumes: ["mysql_data:/var/lib/mysql"]
+  server:
+    build: ./server
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: shasthocare
+      DB_USER: root
+      DB_PASSWORD: root
+      CLIENT_URL: http://localhost:5173
+      JWT_ACCESS_SECRET: dev_access_change_me
+      JWT_REFRESH_SECRET: dev_refresh_change_me
+    ports: ["5000:5000"]
+    depends_on: [mysql]
+  client:
+    build: ./client
+    environment:
+      VITE_API_URL: http://localhost:5000/api/v1
+    ports: ["5173:5173"]
+    depends_on: [server]
+volumes:
+  mysql_data:

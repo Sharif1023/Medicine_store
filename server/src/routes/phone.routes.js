@@ -1,0 +1,14 @@
+import {Router} from 'express';
+import {randomInt,randomBytes,createHmac} from 'node:crypto';
+import {z} from 'zod';
+import rateLimit from 'express-rate-limit';
+import {pool,query} from '../config/db.js';
+import {env} from '../config/env.js';
+import {auth} from '../middleware/auth.js';
+import {asyncHandler} from '../utils/asyncHandler.js';
+import {notify} from '../services/notifications.js';
+const r=Router(),limit=rateLimit({windowMs:15*60*1000,limit:10});
+const otpHash=(id,phone,code)=>createHmac('sha256',env.accessSecret).update(id+':'+phone+':'+code).digest('hex');
+r.post('/otp/request',auth,limit,asyncHandler(async(req,res)=>{const [channel]=await query('SELECT status FROM sms_settings WHERE id=1');const [flags]=await query('SELECT sms_enabled FROM notification_settings WHERE id=1');if(!channel?.status||!flags?.sms_enabled)return res.status(503).json({success:false,message:'SMS verification is unavailable'});const code=String(randomInt(100000,1000000));const conn=await pool.getConnection();try{await conn.beginTransaction();await conn.execute('INSERT INTO verification_otps(user_id,code_hash,expires_at) VALUES(?,?,DATE_ADD(NOW(),INTERVAL 5 MINUTE)) ON DUPLICATE KEY UPDATE code_hash=VALUES(code_hash),attempts=0,expires_at=VALUES(expires_at)',[req.user.id,otpHash(req.user.id,req.user.phone,code)]);await notify('otp',req.user,{otp:code},'otp:'+req.user.id+':'+randomBytes(8).toString('hex'),conn);await conn.commit();res.json({success:true})}catch(e){await conn.rollback();throw e}finally{conn.release()}}));
+r.post('/otp/verify',auth,limit,asyncHandler(async(req,res)=>{const {code}=z.object({code:z.string().regex(/^\d{6}$/)}).parse(req.body);const conn=await pool.getConnection();try{await conn.beginTransaction();const [[otp]]=await conn.execute('SELECT * FROM verification_otps WHERE user_id=? AND expires_at>NOW() FOR UPDATE',[req.user.id]);if(!otp||otp.attempts>=5){await conn.rollback();return res.status(400).json({success:false,message:'Code expired or attempts exhausted'})}if(otp.code_hash!==otpHash(req.user.id,req.user.phone,code)){await conn.execute('UPDATE verification_otps SET attempts=attempts+1 WHERE user_id=?',[req.user.id]);await conn.commit();return res.status(400).json({success:false,message:'Incorrect code'})}await conn.execute('UPDATE users SET phone_verified_at=NOW() WHERE id=?',[req.user.id]);await conn.execute('DELETE FROM verification_otps WHERE user_id=?',[req.user.id]);await conn.commit();res.json({success:true})}catch(e){await conn.rollback();throw e}finally{conn.release()}}));
+export default r;

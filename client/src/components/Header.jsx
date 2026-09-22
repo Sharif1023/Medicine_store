@@ -109,6 +109,15 @@ export default function Header(){
 
   const {data:cfg}=useSiteConfig();
 
+  const {data:cart=[]}=useQuery({
+    queryKey:['cart'],
+    queryFn:()=>http.get('/user/cart').then(r=>r.data.data),
+  });
+
+  // Count unique products only (quantity does not increase badge)
+  // Example: Product A x5 + Product B x2 = Cart count 2
+  const cartCount = cart.length;
+
 
   /* =======================================================
      BRAND
@@ -675,12 +684,18 @@ export default function Header(){
 
             <Link
               to="/cart"
-              className="flex flex-col items-center gap-1 text-slate-700 transition hover:text-brand-700"
+              className="relative flex flex-col items-center gap-1 text-slate-700 transition hover:text-brand-700"
             >
 
-              <ShoppingCart
-                size={20}
-              />
+              <span className="relative">
+                <ShoppingCart size={20}/>
+
+                {cartCount>0&&(
+                  <span className="absolute -right-3 -top-3 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-600 px-1 text-[10px] font-black text-white">
+                    {cartCount}
+                  </span>
+                )}
+              </span>
 
               <span className="hidden min-[360px]:block">
                 Cart
@@ -1343,11 +1358,15 @@ export default function Header(){
                 className="flex min-h-12 items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 transition hover:bg-brand-50 hover:text-brand-700"
               >
 
-                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-700">
+                <span className="relative grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-700">
 
-                  <ShoppingCart
-                    size={18}
-                  />
+                  <ShoppingCart size={18}/>
+
+                  {cartCount>0&&(
+                    <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-600 px-1 text-[10px] font-black text-white">
+                      {cartCount}
+                    </span>
+                  )}
 
                 </span>
 

@@ -6,6 +6,7 @@ import {useAuthStore} from '../../store/auth';
 import http from '../../api/http';
 import {useSiteConfig,setting} from '../../hooks/useSiteConfig';
 
+
 const groups=[
   ['Overview',[[LayoutDashboard,'Dashboard','/admin',null]]],
   ['Catalog',[[Package,'Products','/admin/products','products.view'],[Shapes,'Categories','/admin/categories','products.view'],[Tags,'Brands','/admin/brands','products.view'],[Factory,'Manufacturers','/admin/manufacturers','products.view']]],
@@ -22,10 +23,332 @@ const groups=[
   ['Administration',[[UserCog,'Staff','/admin/staff','staff.manage'],[Shield,'Roles & Permissions','/admin/roles','staff.manage'],[ScrollText,'Audit Logs','/admin/audit-logs','staff.manage'],[Settings,'Settings','/admin/settings','settings.manage']]]
 ];
 
+
 export default function AdminLayout(){
-  const [open,setOpen]=useState(false);const [collapsed,setCollapsed]=useState({});const user=useAuthStore(s=>s.user);const logoutLocal=useAuthStore(s=>s.logoutLocal);const nav=useNavigate();const {data:cfg}=useSiteConfig();const brand=setting(cfg,'brand.name','ShasthoCare');
-  const can=perm=>!perm||user?.permissions?.includes('*')||user?.permissions?.includes(perm);
-  const visibleGroups=groups.map(([name,items])=>[name,items.filter(([, , ,perm])=>can(perm))]).filter(([,items])=>items.length);
-  const logout=async()=>{try{await http.post('/auth/logout')}catch{}logoutLocal();nav('/admin/login')};
-  return <div className="min-h-screen bg-slate-50"><aside className={`fixed inset-y-0 left-0 z-[70] w-72 transform overflow-y-auto bg-slate-950 text-white transition lg:translate-x-0 ${open?'translate-x-0':'-translate-x-full'}`}><div className="sticky top-0 z-10 flex h-20 items-center justify-between border-b border-white/10 bg-slate-950 px-5"><NavLink to="/admin" onClick={()=>setOpen(false)} className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-xl bg-brand-500 text-2xl font-black">+</span><div><div className="text-xl font-black">{brand}</div><div className="text-[10px] uppercase tracking-[.2em] text-slate-400">Administration</div></div></NavLink><button className="lg:hidden" onClick={()=>setOpen(false)}><X/></button></div><nav className="space-y-5 px-3 py-5">{visibleGroups.map(([name,items])=><div key={name}><button onClick={()=>setCollapsed(x=>({...x,[name]:!x[name]}))} className="flex w-full items-center justify-between px-3 py-1 text-[10px] font-black uppercase tracking-[.18em] text-slate-500"><span>{name}</span><ChevronDown size={13} className={`transition ${collapsed[name]?'rotate-180':''}`}/></button>{!collapsed[name]&&<div className="mt-1 space-y-1">{items.map(([Icon,label,to])=><NavLink key={to} end={to==='/admin'} to={to} onClick={()=>setOpen(false)} className={({isActive})=>`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition ${isActive?'bg-brand-600 text-white shadow-lg shadow-brand-900/20':'text-slate-300 hover:bg-white/10 hover:text-white'}`}><Icon size={17}/>{label}</NavLink>)}</div>}</div>)}</nav><div className="m-3 rounded-2xl border border-white/10 bg-white/5 p-4"><div className="text-xs text-slate-400">Signed in as</div><div className="mt-1 font-bold">{user?.firstName||'Admin'}</div><div className="truncate text-xs text-slate-400">{user?.email}</div><div className="mt-1 text-[11px] text-slate-500">{(user?.roles||[]).join(', ')}</div><button onClick={logout} className="mt-3 flex items-center gap-2 text-xs font-bold text-rose-300"><LogOut size={14}/>Sign out</button></div></aside>{open&&<button aria-label="Close admin menu" className="fixed inset-0 z-[60] bg-slate-950/50 lg:hidden" onClick={()=>setOpen(false)}/>}<div className="lg:pl-72"><header className="sticky top-0 z-50 flex h-20 items-center justify-between border-b bg-white/95 px-4 backdrop-blur sm:px-6"><div className="flex items-center gap-3"><button className="btn-ghost lg:hidden" onClick={()=>setOpen(true)}><Menu/></button><div><b>Admin Control Center</b><div className="hidden text-xs text-slate-500 sm:block">The public website reads catalog, content and settings from this panel.</div></div></div><div className="flex items-center gap-2"><NavLink to="/" target="_blank" className="btn-secondary px-3 py-2 text-sm"><Globe2 size={16}/>View Store</NavLink>{can('settings.manage')&&<NavLink to="/admin/settings" className="grid h-10 w-10 place-items-center rounded-full bg-brand-50 font-black text-brand-700">{(user?.firstName||'A')[0]}</NavLink>}</div></header><main className="p-4 sm:p-6 lg:p-8"><Outlet/><AdminDialogs/></main></div></div>;
+
+  const [open,setOpen]=useState(false);
+  const [collapsed,setCollapsed]=useState({});
+
+  const user=useAuthStore(s=>s.user);
+  const logoutLocal=useAuthStore(s=>s.logoutLocal);
+  const nav=useNavigate();
+
+  const {data:cfg}=useSiteConfig();
+
+  const brand=setting(cfg,'brand.name','ShasthoCare');
+
+  // SAME LOGO AS PUBLIC WEBSITE
+  const logo=setting(cfg,'brand.logo','/logo.png');
+
+
+  const can=perm =>
+    !perm ||
+    user?.permissions?.includes('*') ||
+    user?.permissions?.includes(perm);
+
+
+  const visibleGroups=
+    groups
+    .map(([name,items])=>[
+      name,
+      items.filter(([, , ,perm])=>can(perm))
+    ])
+    .filter(([,items])=>items.length);
+
+
+  const logout=async()=>{
+    try{
+      await http.post('/auth/logout')
+    }catch{}
+
+    logoutLocal();
+    nav('/admin/login');
+  };
+
+
+return (
+
+<div className="min-h-screen bg-slate-50">
+
+
+<aside className={`fixed inset-y-0 left-0 z-[70] w-72 transform overflow-y-auto bg-slate-950 text-white transition lg:translate-x-0 ${open?'translate-x-0':'-translate-x-full'}`}>
+
+
+<div className="sticky top-0 z-10 flex h-20 items-center justify-between border-b border-white/10 bg-slate-950 px-5">
+
+
+<NavLink 
+to="/admin" 
+onClick={()=>setOpen(false)}
+className="flex items-center gap-3"
+>
+
+
+<span className="grid h-10 w-10 place-items-center overflow-hidden rounded-xl bg-white shadow">
+
+<img
+src={logo}
+alt={brand}
+className="h-full w-full object-contain"
+/>
+
+</span>
+
+
+<div>
+
+<div className="text-xl font-black">
+{brand}
+</div>
+
+
+<div className="text-[10px] uppercase tracking-[.2em] text-slate-400">
+Administration
+</div>
+
+
+</div>
+
+
+</NavLink>
+
+
+<button 
+className="lg:hidden" 
+onClick={()=>setOpen(false)}
+>
+<X/>
+</button>
+
+
+</div>
+
+
+
+<nav className="space-y-5 px-3 py-5">
+
+
+{visibleGroups.map(([name,items])=>(
+
+<div key={name}>
+
+
+<button
+onClick={()=>setCollapsed(x=>({...x,[name]:!x[name]}))}
+className="flex w-full items-center justify-between px-3 py-1 text-[10px] font-black uppercase tracking-[.18em] text-slate-500"
+>
+
+<span>{name}</span>
+
+<ChevronDown 
+size={13}
+className={`transition ${collapsed[name]?'rotate-180':''}`}
+/>
+
+</button>
+
+
+
+{!collapsed[name]&&
+
+<div className="mt-1 space-y-1">
+
+
+{items.map(([Icon,label,to])=>(
+
+
+<NavLink
+key={to}
+end={to==='/admin'}
+to={to}
+onClick={()=>setOpen(false)}
+
+className={({isActive})=>
+`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition ${
+isActive
+?'bg-brand-600 text-white shadow-lg shadow-brand-900/20'
+:'text-slate-300 hover:bg-white/10 hover:text-white'
+}`
+}
+
+>
+
+
+<Icon size={17}/>
+
+{label}
+
+
+</NavLink>
+
+
+))}
+
+
+</div>
+
+
+}
+
+
+
+</div>
+
+
+))}
+
+
+</nav>
+
+
+
+<div className="m-3 rounded-2xl border border-white/10 bg-white/5 p-4">
+
+
+<div className="text-xs text-slate-400">
+Signed in as
+</div>
+
+
+<div className="mt-1 font-bold">
+{user?.firstName||'Admin'}
+</div>
+
+
+<div className="truncate text-xs text-slate-400">
+{user?.email}
+</div>
+
+
+<div className="mt-1 text-[11px] text-slate-500">
+{(user?.roles||[]).join(', ')}
+</div>
+
+
+<button 
+onClick={logout}
+className="mt-3 flex items-center gap-2 text-xs font-bold text-rose-300"
+>
+
+<LogOut size={14}/>
+Sign out
+
+</button>
+
+
+</div>
+
+
+</aside>
+
+
+
+{open&&
+<button
+aria-label="Close admin menu"
+className="fixed inset-0 z-[60] bg-slate-950/50 lg:hidden"
+onClick={()=>setOpen(false)}
+/>
+}
+
+
+
+
+<div className="lg:pl-72">
+
+
+<header className="sticky top-0 z-50 flex h-20 items-center justify-between border-b bg-white/95 px-4 backdrop-blur sm:px-6">
+
+
+<div className="flex items-center gap-3">
+
+
+<button
+className="btn-ghost lg:hidden"
+onClick={()=>setOpen(true)}
+>
+<Menu/>
+</button>
+
+
+
+<div>
+
+<b>
+Admin Control Center
+</b>
+
+
+<div className="hidden text-xs text-slate-500 sm:block">
+The public website reads catalog, content and settings from this panel.
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+<div className="flex items-center gap-2">
+
+
+<NavLink
+  to="/"
+  target="_blank"
+  className="btn-secondary flex items-center gap-2 px-3 py-2 text-sm"
+>
+  <span className="grid h-7 w-7 place-items-center rounded-full bg-emerald-500 text-white shadow">
+    <Stethoscope size={15}/>
+  </span>
+
+  <span className="font-semibold">
+    View Store
+  </span>
+
+</NavLink>
+
+
+
+{can('settings.manage')&&
+
+<NavLink
+to="/admin/settings"
+className="grid h-10 w-10 place-items-center rounded-full bg-brand-50 font-black text-brand-700"
+>
+
+{(user?.firstName||'A')[0]}
+
+</NavLink>
+
+}
+
+
+
+</div>
+
+
+</header>
+
+
+
+<main className="p-4 sm:p-6 lg:p-8">
+
+<Outlet/>
+
+<AdminDialogs/>
+
+</main>
+
+
+
+</div>
+
+
+
+</div>
+
+);
+
 }

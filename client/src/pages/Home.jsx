@@ -331,13 +331,14 @@ function Hero({
   settings
 }){
 
-  const slides=
-    banners.length
-      ? banners
-      : [null];
+  const slides =
+    banners.length ? banners : [null];
 
 
   const [index,setIndex]=useState(0);
+
+  const [visible,setVisible]=useState(true);
+
 
 
   useEffect(()=>{
@@ -349,324 +350,392 @@ function Hero({
   ]);
 
 
+
+
   useEffect(()=>{
 
-    if(slides.length<2){
+    if(slides.length < 2){
       return;
     }
 
 
-    const id=
-      setInterval(
-        ()=>{
-
-          setIndex(
-            i=>
-              (i+1)%
-              slides.length
-          );
-
-        },
-        5000
-      );
+    const timer=setInterval(()=>{
 
 
-    return()=>
-      clearInterval(id);
+      setVisible(false);
+
+
+      setTimeout(()=>{
+
+
+        setIndex(prev=>
+          (prev+1)%slides.length
+        );
+
+
+        setVisible(true);
+
+
+      },400);
+
+
+
+    },5000);
+
+
+
+    return ()=>clearInterval(timer);
+
 
   },[
     slides.length
   ]);
 
 
-  const banner=
+
+
+
+  const banner =
     slides[index];
 
 
-  const title=
-    banner?.title||
-    'Better Health, Delivered Daily.';
 
+  const title =
+    banner?.title ||
+    "Better Health, Delivered Daily.";
 
-  const subtitle=
-    banner?.subtitle||
-    '<p>Genuine healthcare products, trusted service and convenient delivery from one modern storefront.</p>';
 
 
-  const cta=
-    banner?.button_text||
-    'Shop Medicines';
+  const subtitle =
+    banner?.subtitle ||
+    "<p>Genuine healthcare products, trusted service and convenient delivery from one modern storefront.</p>";
 
 
-  const ctaUrl=
-    banner?.button_url||
-    '/products';
 
+  const cta =
+    banner?.button_text ||
+    "Shop Medicines";
 
-  return(
 
-    <section className="hero-surface overflow-hidden">
 
-      <div
-        className="
-          container-app
-          grid
-          items-center
-          gap-7
-          py-8
-          md:gap-10
-          md:py-12
-          lg:min-h-[520px]
-          lg:grid-cols-2
-        "
-      >
+  const ctaUrl =
+    banner?.button_url ||
+    "/products";
 
 
-        {/* =============================================
-            HERO CONTENT
-            ============================================= */}
 
-        <div>
 
-          <span className="badge bg-white text-brand-700 shadow">
 
-            {' '}
+return (
 
-            {
-              settings[
-                'home.hero_badge'
-              ]||
-              'Your Health, Our Priority'
-            }
+<section className="hero-surface overflow-hidden">
 
-          </span>
 
+<div className="
+container-app
+grid
+items-center
+gap-7
+py-8
+md:grid-cols-2
+md:py-12
+lg:min-h-[520px]
+">
 
-          <h1
-            className="
-              mt-5
-              max-w-2xl
-              text-4xl
-              font-black
-              leading-[1.04]
-              tracking-tight
-              md:text-6xl
-            "
-          >
 
-            {title}
+{/* CONTENT */}
 
-          </h1>
+<div
 
+className={`
+transition-all
+duration-500
+ease-in-out
+transform
 
-          <RichContent
-            html={subtitle}
+${
+visible
 
-            className="
-              rich-content
-              mt-5
-              max-w-xl
-              text-base
-              text-slate-600
-              md:text-lg
-            "
-          />
+?
+"opacity-100 translate-y-0"
 
+:
 
-          <div className="mt-7 flex flex-wrap gap-3">
-
-            <Link
-              to={ctaUrl}
-              className="btn-primary"
-            >
-
-              {cta}
-
-              <ArrowRight size={18}/>
-
-            </Link>
-
-
-            <Link
-              to="/account/prescriptions"
-              className="btn-secondary"
-            >
-
-              <Upload size={18}/>
-
-              Upload Prescription
-
-            </Link>
-
-          </div>
-
-
-          <p className="mt-7 text-sm font-semibold text-slate-600">
-
-            {
-              settings[
-                'home.hero_note'
-              ]||
-              '100% genuine products • Secure checkout • Professional support'
-            }
-
-          </p>
-
-
-          {banner?.content&&(
-
-            <RichContent
-              html={
-                banner.content
-              }
-
-              className="rich-content mt-5 max-w-xl text-sm text-slate-500"
-            />
-
-          )}
-
-        </div>
-
-
-        {/* =============================================
-            HERO IMAGE
-
-            MOBILE + DESKTOP SHOW
-            ============================================= */}
-
-        <div
-          className="
-            relative
-            min-h-[240px]
-            sm:min-h-[320px]
-            md:min-h-[390px]
-          "
-        >
-
-          {banner?.image?(
-
-            <picture
-              key={
-                banner.id
-              }
-            >
-
-
-              {/* MOBILE IMAGE */}
-
-              {banner.mobile_image&&(
-
-                <source
-                  media="(max-width: 767px)"
-
-                  srcSet={
-                    assetUrl(
-                      banner.mobile_image
-                    )
-                  }
-                />
-
-              )}
-
-
-              {/* DESKTOP / FALLBACK IMAGE */}
-
-              <img
-                src={
-                  assetUrl(
-                    banner.image
-                  )
-                }
-
-                alt={
-                  banner.title||
-                  'Healthcare promotion'
-                }
-
-                className="
-                  absolute
-                  inset-0
-                  h-full
-                  w-full
-                  rounded-3xl
-                  object-cover
-                  shadow-xl
-                  transition-opacity
-                  duration-500
-                  md:rounded-[2.5rem]
-                  md:shadow-2xl
-                "
-              />
-
-            </picture>
-
-          ):(
-
-            <HeroIllustration/>
-
-          )}
-
-
-          {/* SLIDER DOTS */}
-
-          {slides.length>1&&(
-
-            <div
-              className="
-                absolute
-                bottom-4
-                left-1/2
-                z-10
-                flex
-                -translate-x-1/2
-                gap-2
-              "
-            >
-
-              {slides.map(
-                (x,i)=>(
-
-                  <button
-                    type="button"
-
-                    aria-label={
-                      `Show hero slide ${i+1}`
-                    }
-
-                    key={
-                      x?.id||
-                      i
-                    }
-
-                    onClick={()=>
-                      setIndex(i)
-                    }
-
-                    className={
-                      `h-2.5 rounded-full bg-white shadow transition-all ${
-                        i===index
-                          ? 'w-8'
-                          : 'w-2.5 opacity-70'
-                      }`
-                    }
-                  />
-
-                )
-              )}
-
-            </div>
-
-          )}
-
-        </div>
-
-      </div>
-
-    </section>
-
-  );
+"opacity-0 translate-y-3"
 
 }
+
+`}
+
+>
+
+
+<span className="
+badge
+bg-white
+text-brand-700
+shadow
+">
+
+{
+settings['home.hero_badge']
+||
+"Your Health, Our Priority"
+}
+
+</span>
+
+
+
+
+<h1 className="
+mt-5
+max-w-2xl
+text-4xl
+font-black
+leading-tight
+tracking-tight
+md:text-6xl
+">
+
+{title}
+
+</h1>
+
+
+
+
+<RichContent
+
+html={subtitle}
+
+className="
+rich-content
+mt-5
+max-w-xl
+text-base
+text-slate-600
+md:text-lg
+"
+
+/>
+
+
+
+
+<div className="
+mt-7
+flex
+flex-wrap
+gap-3
+">
+
+
+<Link
+to={ctaUrl}
+className="btn-primary"
+>
+
+{cta}
+
+<ArrowRight size={18}/>
+
+</Link>
+
+
+
+<Link
+to="/account/prescriptions"
+className="btn-secondary"
+>
+
+<Upload size={18}/>
+
+Upload Prescription
+
+</Link>
+
+
+</div>
+
+
+
+
+
+<p className="
+mt-7
+text-sm
+font-semibold
+text-slate-600
+">
+
+{
+settings['home.hero_note']
+||
+"100% genuine products • Secure checkout • Professional support"
+}
+
+</p>
+
+
+
+</div>
+
+
+
+
+
+
+{/* IMAGE */}
+
+<div className="
+relative
+min-h-[240px]
+sm:min-h-[320px]
+md:min-h-[390px]
+">
+
+
+<div
+className={`
+absolute
+inset-0
+transition-all
+duration-700
+ease-in-out
+
+${
+visible
+
+?
+"opacity-100 scale-100"
+
+:
+
+"opacity-0 scale-105"
+
+}
+
+`}
+>
+
+
+{
+banner?.image
+
+?
+
+<img
+
+src={assetUrl(
+banner.image
+)}
+
+alt={
+banner.title ||
+"Healthcare promotion"
+}
+
+className="
+h-full
+w-full
+rounded-3xl
+object-cover
+shadow-xl
+md:rounded-[2.5rem]
+"
+
+/>
+
+:
+
+<HeroIllustration/>
+
+}
+
+
+</div>
+
+
+
+
+{
+slides.length>1 &&
+
+<div className="
+absolute
+bottom-4
+left-1/2
+flex
+-translate-x-1/2
+gap-2
+">
+
+{
+slides.map((x,i)=>(
+
+<button
+
+key={x?.id || i}
+
+onClick={()=>{
+
+
+setVisible(false);
+
+
+setTimeout(()=>{
+
+setIndex(i);
+setVisible(true);
+
+},400);
+
+
+}}
+
+className={`
+h-2.5
+rounded-full
+bg-white
+shadow
+transition-all
+
+${
+i===index
+?
+"w-8"
+:
+"w-2.5 opacity-70"
+}
+
+`}
+
+/>
+
+))
+
+}
+
+</div>
+
+}
+
+
+
+</div>
+
+
+
+</div>
+
+
+</section>
+
+);
+
+}
+
 
 
 /* =========================================================

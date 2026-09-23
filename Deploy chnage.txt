@@ -2,3 +2,6 @@ jodi benner upload na hoi
 server\src\routes\content.routes.js
 
 
+2. Image jeno url diyei dewa jai eita fix korte hobe.
+
+3. image upload hote late hosche. eita fix korte hobe
